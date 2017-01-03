@@ -1,3 +1,4 @@
+
 int trigPin1 = 7, echoPin1 = 8;
 int distance1=0,duration1=0;
 
@@ -13,12 +14,15 @@ bool out_process = false;
 
 int max_wait = 0; // counter for reset
 int counter = 0;
+int timer = 0;
+char count_buffer[3];
 
 const int side_threshold = 50;
 const int up_threshold = 70;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  Serial1.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect.
   }
@@ -104,13 +108,29 @@ void loop() {
     }
   }
   
-  if (max_wait > 25) {
+  if (max_wait > 10) {
     Serial.println("no wait");
     reset();
   }
   
   if (counter < 0) counter = 0;
   delay(100);
+
+  timer++;
+  if (timer > 50) {
+    timer = 0;
+    sprintf(count_buffer, "%d\0", counter);
+    Serial1.print("AT+DTX=");
+    Serial1.print(strlen(count_buffer));
+    Serial1.print(",\"");
+    Serial1.print(count_buffer);
+    Serial1.println("\"");
+    
+    Serial.print(count_buffer);
+    Serial.println("Send count");
+    Serial.print(strlen(count_buffer));
+    Serial.println("len");
+  }
 }
 
 

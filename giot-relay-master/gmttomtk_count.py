@@ -5,15 +5,9 @@ import urllib2
 mcs_data_format = {
    "datapoints":[
       {
-         "dataChnId":"Temp_Display",
+         "dataChnId":"Count_Display",
          "values":{
-            "value":"28.00"
-         }
-      },
-      {
-         "dataChnId":"Hum_Display",
-         "values":{
-            "value":"27.00"
+            "value":"0"
          }
       }
    ]
@@ -38,11 +32,10 @@ def on_message(client, userdata, msg):
     string_value = json_extractor['data'].decode("hex")
 #    print(string_value[1:6])
 #    print(string_value[6:11])
-    mcs_data_format['datapoints'][0]['values']['value'] = string_value[1:6]
-    mcs_data_format['datapoints'][1]['values']['value'] = string_value[6:11]
+    mcs_data_format['datapoints'][0]['values']['value'] = string_value
 #    print(mcs_data_format)
-    req = urllib2.Request('https://api.mediatek.com/mcs/v2/devices/D2xUsOXy/datapoints')
-    req.add_header('deviceKey', '0XHSZHwZe7p9vCxs')
+    req = urllib2.Request('https://api.mediatek.com/mcs/v2/devices/DyOeDlNu/datapoints')
+    req.add_header('deviceKey', 'Ee0dOLbhacsu6PtB')
     req.add_header('Content-Type', 'application/json')
 
     response = urllib2.urlopen(req, json.dumps(mcs_data_format))
