@@ -10,13 +10,12 @@ bool inside = false;
 bool outside = false;
 bool in_process = false;
 bool out_process = false;
-bool in = false;
-bool out = false;
+
 int max_wait = 0; // counter for reset
 int counter = 0;
 
-const int side_threshold = 30;
-const int up_threshold = 20;
+const int side_threshold = 50;
+const int up_threshold = 70;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -27,7 +26,17 @@ void setup() {
   pinMode(echoPin1, INPUT);
   pinMode(trigPin2, OUTPUT);
   pinMode(echoPin2, INPUT);
+  counter = 0;
+}
 
+void reset() {
+    inside = false;
+    outside = false;
+    in_process = false;
+    out_process = false;
+    flag1 = false;
+    flag2 = false;
+    max_wait = 0;
 }
 
 void loop() {
@@ -56,45 +65,53 @@ void loop() {
   //Serial.print(distance2);
   
   if (distance1 < up_threshold) {
-    Serial.println("outside_up");
+    //Serial.println("outside_up");
     flag1 = true;
   }
   if (distance2 < side_threshold) {
-    Serial.println("inside_side");
+    //Serial.println("inside_side");
     flag2 = true;
   }
-  if (flag1 == true && flag2 == false && in_process == false && out_process == false) {
-    Serial.println("wait to in");
+  if (flag1 == true && flag2 == false) {
     outside = true;
-    in_process = true;
-  }
-  if (flag1 == false && flag2 == true && out_process == false && in_process == false) {
-    Serial.println("wait to out");
+    if (in_process == false && out_process == false) {
+      in_process = true;
+    }
+  } else if (flag1 == false && flag2 == true) {
     inside = true;
-    out_process = true;
+    if (in_process == false && out_process == false) {
+      out_process = true;
+    }
   }
 
   if (in_process == true && out_process == false) {
     max_wait++;
+    //Serial.println("still wait to in");
     if (inside == true) {
       Serial.println("in");
-      Serial.println(counter++);
+      ++counter;
+      Serial.println(counter);
+      reset();
     }
-  }
-  if (out_process == true && in_process == false) {
+  } else if (out_process == true && in_process == false) {
     max_wait++;
+    //Serial.println("still wait to out");
     if (outside == true) {
       Serial.println("out");
-      Serial.println(counter--);
+      --counter;
+      Serial.println(counter);
+      reset();
     }
   }
-  if (max_wait > 10) {
-    inside = false;
-    outside = false;
-    in_process = false;
-    out_process = false;
-    max_wait = 0;
+  
+  if (max_wait > 25) {
+    Serial.println("no wait");
+    reset();
   }
   
+  if (counter < 0) counter = 0;
   delay(100);
 }
+
+
+
