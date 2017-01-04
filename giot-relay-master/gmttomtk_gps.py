@@ -2,6 +2,7 @@ import client as mqtt
 import json
 import urllib2
 
+# global variable
 mcs_data_format = {
    "datapoints":[
       {
@@ -10,7 +11,7 @@ mcs_data_format = {
             "value":"0"
             "latitude": "0",
             "longitude": "0"
-            "altitude": "14"
+            "altitude": "0"
          }
       }
    ]
@@ -35,13 +36,10 @@ def on_message(client, userdata, msg):
     string_value = json_extractor['data'].decode("hex")
 #    print(string_value[1:6])
 #    print(string_value[6:11])
-    if string_value[1] == 'a':
-        altitude = string_value[1:11]
+    if string_value[1] == 'A':
+        mcs_data_format['datapoints'][0]['values']['latitude'] = string_value[1:]
     else:
-        longitude = string_value[1:11]
-
-    mcs_data_format['datapoints'][0]['values']['latitude'] = altitude
-    mcs_data_format['datapoints'][0]['values']['longitude'] = longitude
+        mcs_data_format['datapoints'][0]['values']['longitude'] = string_value[1:]
 #    print(mcs_data_format)
     req = urllib2.Request('https://api.mediatek.com/mcs/v2/devices/DyOeDlNu/datapoints')
     req.add_header('deviceKey', 'Ee0dOLbhacsu6PtB')
@@ -54,8 +52,6 @@ def on_message(client, userdata, msg):
 client = mqtt.Client(client_id="200000066-generic-service", protocol=mqtt.MQTTv31)
 client.on_connect = on_connect
 client.on_message = on_message
-latitude = 0
-longitude = 0
 client.username_pw_set("200000066", password="44169456")
 client.connect("52.193.146.103", 80, 60)
 
