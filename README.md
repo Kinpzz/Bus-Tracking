@@ -27,6 +27,8 @@
 
 下面用状态机来表示这一个过程:
 
+注：只有当两个distance的距离不同时小于阈值的时候才会作为触发条件。否则会进入1->3->5的loop中
+
 ![](https://ws4.sinaimg.cn/large/6177e8b1jw1fbmy3dbiogj218u0pyjww.jpg)
 
 * S : 初始状态，程序启动，维护一个人数统计变量counter，初始化0，进入状态1

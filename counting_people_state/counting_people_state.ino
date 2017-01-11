@@ -12,14 +12,11 @@ int iter = 0;
 
 const int max_wait = 50; // counter for reset
 const int side_threshold = 50;
-const int up_threshold = 70;
+const int up_threshold = 90;
 void setup() {
   // put your setup code here, to run once:
-  //Serial.begin(9600);
+  Serial.begin(9600);
   Serial1.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect.
-  }
   pinMode(trigPin1, OUTPUT);
   pinMode(echoPin1, INPUT);
   pinMode(trigPin2, OUTPUT);
@@ -77,17 +74,17 @@ void loop() {
         }
         break;
       case 4 :
-        //Serial.println("State4 in");
+        //Serial.print("State4 in");
         counter++;
-        //Serial.println(counter);
+        Serial.println(counter);
         iter = 0;
         state = 1;
         delay(50);
         break;
       case 5 :
-        //Serial.println("State5 out");
+        //Serial.print("State5 out");
         counter--;
-        //Serial.println(counter);
+        Serial.println(counter);
         iter = 0;
         state = 1;
         delay(50);
@@ -97,7 +94,7 @@ void loop() {
   if (counter < 0) counter = 0;
 
   timer++;
-  if (timer > 500) {
+  if (timer > 1000) {
     timer = 0;
     sprintf(count_buffer, "%d\0", counter);
     Serial1.print("AT+DTX=");
@@ -106,8 +103,8 @@ void loop() {
     Serial1.print(count_buffer);
     Serial1.println("\"");
     
-    //Serial.print(count_buffer);
-    //Serial.println("Send count");
+    Serial.print(count_buffer);
+    Serial.println(" Send count");
   }
 }
 

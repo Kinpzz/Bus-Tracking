@@ -9,6 +9,14 @@ mcs_data_format = {
          "values":{
             "value":"0"
          }
+      },
+	  {
+         "dataChnId":"GPS_display",
+         "values":{
+            "latitude": "0",
+            "longitude": "0",
+            "altitude": "0"
+         }
       }
    ]
 }
@@ -32,7 +40,13 @@ def on_message(client, userdata, msg):
     string_value = json_extractor['data'].decode("hex")
 #    print(string_value[1:6])
 #    print(string_value[6:11])
-    mcs_data_format['datapoints'][0]['values']['value'] = string_value
+    
+	if string_value[1] == 'A':
+        mcs_data_format['datapoints'][1]['values']['latitude'] = string_value[1:]
+    elif string_value[1] == 'L':
+        mcs_data_format['datapoints'][1]['values']['longitude'] = string_value[1:]
+	else:
+		mcs_data_format['datapoints'][0]['values']['value'] = string_value
 #    print(mcs_data_format)
     req = urllib2.Request('https://api.mediatek.com/mcs/v2/devices/DyOeDlNu/datapoints')
     req.add_header('deviceKey', 'Ee0dOLbhacsu6PtB')

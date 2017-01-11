@@ -6,7 +6,7 @@ gpsSentenceInfoStruct info;
 double location[2];
 char buff[256];
 
-static unsigned char getComma(unsigned char num,const char *str)
+unsigned char getComma(unsigned char num,const char *str)
 {
   unsigned char i,j = 0;
   int len=strlen(str);
@@ -20,7 +20,7 @@ static unsigned char getComma(unsigned char num,const char *str)
   return 0; 
 }
 
-static double getDoubleNumber(const char *s)
+double getDoubleNumber(const char *s)
 {
   char buf[10];
   unsigned char i;
@@ -34,7 +34,7 @@ static double getDoubleNumber(const char *s)
   return rev; 
 }
 
-static double getIntNumber(const char *s)
+double getIntNumber(const char *s)
 {
   char buf[10];
   unsigned char i;
@@ -60,7 +60,7 @@ void setLocation(double *location) {
     tmp = getComma(4, GPGGAstr);
     // longitude
     location[1] = getDoubleNumber(&GPGGAstr[tmp]);
-    sprintf(buff, "latitude = %10.4f, longitude = %10.4f", location[0], location[1]);
+    sprintf(buff, "latitude = %.4f, longitude = %.4f", location[0], location[1]);
     Serial.println(buff);
     tmp = getComma(7, GPGGAstr);
     num = getIntNumber(&GPGGAstr[tmp]);
@@ -78,14 +78,43 @@ void setup(){
   Serial.println("LGPS Power on, and waiting ...");
   delay(3000);
   setLocation(location);
-}
+}  
+
+char buf[80];
+int size;
+
 void loop(){
+
+//  Serial1.println()
+//  Serial1.println("AT+DTX=16,\"8600.0000,0.0000\"");
   setLocation(location);
-  Serial1.print("AT+DTX=11,\"T");
-  Serial1.print(location[0]);
-  Serial1.print(location[1]);
+  
+  memset(buf, 80,'\0');
+  sprintf(buf, "A%.4f\0", location[0]);
+  size = strlen(buf);
+//  Serial.println(buf);
+//  Serial.println(size);
+  
+  Serial1.print("AT+DTX=");
+  Serial1.print(size);
+  Serial1.print(",\"");
+  Serial1.print(buf);
   Serial1.println("\"");
-  //Serial1.println("AT+DTX=11,\"12345ABCdef\"");
+
+  delay(5000); // the latency for lora module
+
+  memset(buf, 80,'\0');
+  sprintf(buf, "L%.4f\0", location[1]);
+  size = strlen(buf);
+  Serial.println(buf);
+  Serial.println(size);
+  
+  Serial1.print("AT+DTX=");
+  Serial1.print(size);
+  Serial1.print(",\"");
+  Serial1.print(buf);
+  Serial1.println("\"");
+
   delay(1000);
   Serial.println("Send GPS over");
   delay(5000);
