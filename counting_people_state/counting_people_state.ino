@@ -1,9 +1,8 @@
-
 int trigPin1 = 7, echoPin1 = 8;
-int distance1=0,duration1=0;
+int distance1=0, duration1=0;
 
 int trigPin2 = 12, echoPin2 = 13;
-int distance2=0,duration2=0;
+int distance2=0, duration2=0;
 
 int counter = 0;
 int timer = 0;
@@ -11,12 +10,12 @@ char count_buffer[3];
 int state = 1;
 int iter = 0;
 
-const int max_wait = 10; // counter for reset
+const int max_wait = 50; // counter for reset
 const int side_threshold = 50;
 const int up_threshold = 70;
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  //Serial.begin(9600);
   Serial1.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect.
@@ -45,57 +44,60 @@ void loop() {
   distance1 = duration1*0.034/2;
   distance2 = duration2*0.034/2;
 
-  //Serial.print("\n distance1=");
-  //Serial.print(distance1);
-
-  //Serial.print("\n distance2=");
-  //Serial.print(distance2);
-  switch(state) {
-    case 1 : 
-      if (distance1 < up_threshold) {
-        state = 2;
-      }
-      if (distance2 < side_threshold) {
-        state = 3;
-      }
-    case 2 :
-      if (distance2 < side_threshold) {
-        state = 4;
-      }
-      iter++;
-      if (iter > max_wait) {
-        Serial.println("no wait");
+  if (distance1 >= up_threshold || distance2 >= side_threshold) {
+    switch(state) {
+      case 1 : 
+        if (distance1 < up_threshold) {
+          state = 2;
+        }
+        if (distance2 < side_threshold) {
+          state = 3;
+        }
+        break;
+      case 2 :
+        if (distance2 < side_threshold) {
+          state = 4;
+        }
+        iter++;
+        if (iter > max_wait) {
+          //Serial.println("no wait");
+          iter = 0;
+          state = 1;
+        }
+        break;
+      case 3 :
+        if (distance1 < up_threshold) {
+          state = 5;
+        }
+        iter++;
+        if (iter > max_wait) {
+          //Serial.println("no wait");
+          iter = 0;
+          state = 1;
+        }
+        break;
+      case 4 :
+        //Serial.println("State4 in");
+        counter++;
+        //Serial.println(counter);
         iter = 0;
         state = 1;
-      }
-    case 3 :
-      if (distance1 < up_threshold) {
-        state = 5;
-      }
-      iter++;
-      if (iter > max_wait) {
-        Serial.println("no wait");
+        delay(50);
+        break;
+      case 5 :
+        //Serial.println("State5 out");
+        counter--;
+        //Serial.println(counter);
         iter = 0;
         state = 1;
-      }
-    case 4 :
-      counter++;
-      Serial.println("in");
-      Serial.println(counter);
-      iter = 0;
-      state = 1;
-    case 5 :
-      counter--;
-      Serial.println("out");
-      Serial.println(counter);
-      iter = 0;
-      state = 1;
+        delay(50);
+        break;
+    }
   }
-
   if (counter < 0) counter = 0;
-  
+
   timer++;
-  if (timer > 50) {
+  if (timer > 500) {
     timer = 0;
     sprintf(count_buffer, "%d\0", counter);
     Serial1.print("AT+DTX=");
@@ -104,10 +106,8 @@ void loop() {
     Serial1.print(count_buffer);
     Serial1.println("\"");
     
-    Serial.print(count_buffer);
-    Serial.println("Send count");
-    Serial.print(strlen(count_buffer));
-    Serial.println("len");
+    //Serial.print(count_buffer);
+    //Serial.println("Send count");
   }
 }
 

@@ -27,7 +27,7 @@
 
 下面用状态机来表示这一个过程:
 
-![](https://ws2.sinaimg.cn/large/6177e8b1jw1fbejmzfq6lj21720mijtq.jpg)
+![](https://ws4.sinaimg.cn/large/6177e8b1jw1fbmy3dbiogj218u0pyjww.jpg)
 
 * S : 初始状态，程序启动，维护一个人数统计变量counter，初始化0，进入状态1
 * State 1 : 程序监测两个超声波测距模组
