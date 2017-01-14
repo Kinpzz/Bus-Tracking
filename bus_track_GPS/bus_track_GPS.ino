@@ -101,7 +101,7 @@ void loop(){
   Serial1.print(buf);
   Serial1.println("\"");
 
-  delay(5000); // the latency for lora module
+  delay(10000); // the latency for lora module
 
   memset(buf, 80,'\0');
   sprintf(buf, "L%.4f\0", location[1]);
